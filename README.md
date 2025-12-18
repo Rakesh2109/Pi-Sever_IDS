@@ -6,7 +6,7 @@ Real-time network security monitoring and analysis on Raspberry Pi with IDS/IPS 
 
 ### Access Points
 - **Grafana**: http://128.39.201.47:3000 (admin/admin123)
-- **Traffic Monitor**: http://128.39.201.47:5000
+- **Traffic Monitor**: http://128.39.201.47:8080
 
 ### System Status
 ```bash
