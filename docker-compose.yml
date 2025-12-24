@@ -121,13 +121,12 @@ services:
 
   # Darkstat - Network traffic monitoring (ARM64 compatible)
   darkstat:
-    image: pjd/darkstat:latest
+    build: ./darkstat
     container_name: darkstat
     network_mode: host
     cap_add:
       - NET_RAW
       - NET_ADMIN
-    command: -i wlan0 --bind-addr 0.0.0.0
     restart: unless-stopped
     privileged: true
 
