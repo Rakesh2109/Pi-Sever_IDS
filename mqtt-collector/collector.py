@@ -42,6 +42,72 @@ def on_message(client, userdata, msg):
             data = json.loads(payload)
             # If it's a dict, extract numeric values and tags
             if isinstance(data, dict):
+                # Handle Health/Bio sensor data
+                if 'heartRate' in data or 'oxygen' in data:
+                    # Create separate point for health sensor data
+                    point = Point("health_sensors") \
+                        .tag("sensor", "biosensor") \
+                        .tag("topic", topic) \
+                        .time(time.time_ns())
+                    
+                    # Heart rate data
+                    if 'heartRate' in data:
+                        point = point.field("heart_rate", float(data['heartRate']))
+                    if 'confidence' in data:
+                        point = point.field("heart_confidence", float(data['confidence']))
+                    
+                    # Oxygen saturation data
+                    if 'oxygen' in data:
+                        point = point.field("spo2", float(data['oxygen']))
+                    if 'oxygenConfidence' in data:
+                        point = point.field("spo2_confidence", float(data['oxygenConfidence']))
+                    
+                    # Store timestamp as field (not tag) to avoid creating multiple series
+                    if 'timestamp' in data:
+                        point = point.field("sensor_timestamp", float(data['timestamp']))
+                    
+                    # Write health data to InfluxDB
+                    write_api.write(bucket=INFLUXDB_BUCKET, org=INFLUXDB_ORG, record=point)
+                    logger.info(f"Stored health data: topic={topic}, HR={data.get('heartRate')}, SpO2={data.get('oxygen')}")
+                    return
+                
+                # Handle LSM9DS1 IMU sensor data with nested structure
+                if 'accel' in data and 'gyro' in data and 'mag' in data:
+                    # Create separate point for IMU data with all fields
+                    point = Point("imu_sensors") \
+                        .tag("sensor", "lsm9ds1") \
+                        .tag("topic", topic) \
+                        .time(time.time_ns())
+                    
+                    # Accelerometer data
+                    if isinstance(data['accel'], dict):
+                        point = point.field("accel_x", float(data['accel'].get('x', 0)))
+                        point = point.field("accel_y", float(data['accel'].get('y', 0)))
+                        point = point.field("accel_z", float(data['accel'].get('z', 0)))
+                    
+                    # Gyroscope data
+                    if isinstance(data['gyro'], dict):
+                        point = point.field("gyro_x", float(data['gyro'].get('x', 0)))
+                        point = point.field("gyro_y", float(data['gyro'].get('y', 0)))
+                        point = point.field("gyro_z", float(data['gyro'].get('z', 0)))
+                    
+                    # Magnetometer data
+                    if isinstance(data['mag'], dict):
+                        point = point.field("mag_x", float(data['mag'].get('x', 0)))
+                        point = point.field("mag_y", float(data['mag'].get('y', 0)))
+                        point = point.field("mag_z", float(data['mag'].get('z', 0)))
+                    
+                    # Temperature and heading
+                    if 'temp' in data:
+                        point = point.field("temperature", float(data['temp']))
+                    if 'heading' in data:
+                        point = point.field("heading", float(data['heading']))
+                    
+                    # Write IMU data to InfluxDB
+                    write_api.write(bucket=INFLUXDB_BUCKET, org=INFLUXDB_ORG, record=point)
+                    logger.info(f"Stored IMU data: topic={topic}, temp={data.get('temp')}, heading={data.get('heading')}")
+                    return
+                
                 # Look for common numeric fields: temperature, value, humidity, pressure, etc.
                 # Check temperature first for temperature sensors
                 if 'temperature' in data and isinstance(data['temperature'], (int, float)):

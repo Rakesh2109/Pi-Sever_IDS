@@ -178,19 +178,21 @@ services:
     restart: unless-stopped
     privileged: true
 
-  # Tcpdump - rolling PCAP capture for ALL hotspot traffic (wlan0) - 24x100MB rotating files (1 hour rotation)
+  # Tcpdump - PCAP capture for ALL hotspot traffic (wlan0)
   tcpdump:
     image: nicolaka/netshoot:latest
     container_name: tcpdump
-    command: tcpdump -i wlan0 -G 3600 -W 24 -C 100 -w /pcap/trace-%Y%m%d-%H%M%S.pcap
     network_mode: host
     cap_add:
       - NET_ADMIN
       - NET_RAW
+    command: >
+      tcpdump -i wlan0 -C 100 -W 10 -w /pcap/trace.pcap -n
     volumes:
       - ./pcap:/pcap
     restart: unless-stopped
     privileged: true
+
 
   # Traffic Monitor - Dashboard for Suricata and Zeek
   traffic-monitor:
