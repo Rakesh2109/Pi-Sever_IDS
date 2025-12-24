@@ -28,9 +28,11 @@ A comprehensive Docker-based monitoring system for Raspberry Pi that collects ne
   - Output: `./pcap/trace.pcap`
   - Rotation: 100MB files, 10 file rotation
 
-- **ntopng** - Real-time network traffic monitoring (Currently disabled - ARM64 incompatible)
-  - Note: Official ntopng Docker image doesn't support ARM64 (Raspberry Pi)
-  - Alternatives: Use vnstat, iftop, or analyze PCAP files with custom scripts
+- **Darkstat** - Network traffic monitoring and statistics
+  - Port: 667 (Web dashboard accessible at 128.39.201.47:667)
+  - Interface: wlan0 (hotspot network)
+  - Features: Real-time traffic stats per IP, protocol breakdown, bandwidth monitoring
+  - ARM64 compatible (works on Raspberry Pi)
 
 ## Quick Start
 
@@ -107,10 +109,12 @@ The system is configured to monitor the `wlan0` interface (WiFi hotspot network)
 
 3. **Network Traffic:**
    - Network Interface (wlan0) → Tcpdump → PCAP files
+   - Network Interface (wlan0) → Darkstat → Real-time flow monitoring (Web UI)
 
 ## Access Points
 
 - **Grafana Dashboard:** http://128.39.201.47:3000
+- **Darkstat Network Monitor:** http://128.39.201.47:667
 - **InfluxDB API:** http://localhost:8086
 - **MQTT Broker:** localhost:1883
 
