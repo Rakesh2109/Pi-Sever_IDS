@@ -112,8 +112,10 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
+    environment:
+      - TZ=Europe/Oslo
     command: >
-      sh -c "tcpdump -i wlan0 -nn -C 1024 -w /pcap/trace-$(date +%Y-%m-%d_%H-%M-%S).pcap"
+      sh -c "tcpdump -i wlan0 -nn -C 1024 -w /pcap/trace-$(TZ=Europe/Oslo date +%Y-%m-%d_%H-%M-%S).pcap"
     volumes:
       - ./pcap:/pcap
     restart: unless-stopped
