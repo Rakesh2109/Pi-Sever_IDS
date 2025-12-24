@@ -28,10 +28,9 @@ A comprehensive Docker-based monitoring system for Raspberry Pi that collects ne
   - Output: `./pcap/trace.pcap`
   - Rotation: 100MB files, 10 file rotation
 
-- **ntopng** - Real-time network traffic monitoring and analysis
-  - Port: 3001 (Web dashboard accessible at 128.39.201.47:3001)
-  - Features: Top talkers (IPs), protocol breakdown, flow analysis
-  - Shows: Packets/bytes per IP address, real-time traffic statistics
+- **ntopng** - Real-time network traffic monitoring (Currently disabled - ARM64 incompatible)
+  - Note: Official ntopng Docker image doesn't support ARM64 (Raspberry Pi)
+  - Alternatives: Use vnstat, iftop, or analyze PCAP files with custom scripts
 
 ## Quick Start
 
@@ -72,8 +71,6 @@ A comprehensive Docker-based monitoring system for Raspberry Pi that collects ne
 ├── influxdb/                   # InfluxDB data and configuration
 ├── mqtt/                       # MQTT broker configuration
 ├── mqtt-collector/             # MQTT to InfluxDB collector service
-├── ntopng/                     # ntopng data directory
-│   └── data/                   # ntopng database and data
 ├── pcap/                       # PCAP capture files
 ├── telegraf/                   # Telegraf configuration
 └── README.md                   # This file
@@ -110,12 +107,10 @@ The system is configured to monitor the `wlan0` interface (WiFi hotspot network)
 
 3. **Network Traffic:**
    - Network Interface (wlan0) → Tcpdump → PCAP files
-   - Network Interface (wlan0) → ntopng → Real-time flow monitoring
 
 ## Access Points
 
 - **Grafana Dashboard:** http://128.39.201.47:3000
-- **ntopng Network Monitor:** http://128.39.201.47:3001
 - **InfluxDB API:** http://localhost:8086
 - **MQTT Broker:** localhost:1883
 

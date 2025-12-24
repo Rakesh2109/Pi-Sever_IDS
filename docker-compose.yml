@@ -87,7 +87,7 @@ services:
     container_name: grafana
     user: "0:0"
     ports:
-      - "128.39.201.47:3000:3000"
+      - "0.0.0.0:3000:3000"
     environment:
       - TZ=Europe/Oslo
       - GF_SECURITY_ADMIN_USER=admin
@@ -120,20 +120,22 @@ services:
     privileged: true
 
   # ntopng - Real-time network traffic monitoring
-  ntopng:
-    image: ntop/ntopng:latest
-    container_name: ntopng
-    network_mode: host
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    environment:
-      - TZ=Europe/Oslo
-      - NTOPNG_HTTP_PORT=3001
-    volumes:
-      - ./ntopng/data:/var/lib/ntopng
-    restart: unless-stopped
-    privileged: true
+  # NOTE: Disabled - ntopng official image doesn't support ARM64 (Raspberry Pi)
+  # Use alternative: vnstat, iftop, or custom PCAP analysis scripts instead
+  # ntopng:
+  #   image: ntop/ntopng:latest
+  #   container_name: ntopng
+  #   network_mode: host
+  #   cap_add:
+  #     - NET_ADMIN
+  #     - NET_RAW
+  #   environment:
+  #     - TZ=Europe/Oslo
+  #     - NTOPNG_HTTP_PORT=3001
+  #   volumes:
+  #     - ./ntopng/data:/var/lib/ntopng
+  #   restart: unless-stopped
+  #   privileged: true
 
 networks:
   monitoring:
