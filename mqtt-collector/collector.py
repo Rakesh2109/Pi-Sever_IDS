@@ -71,6 +71,33 @@ def on_message(client, userdata, msg):
                     logger.info(f"Stored health data: topic={topic}, HR={data.get('heartRate')}, SpO2={data.get('oxygen')}")
                     return
                 
+                # Handle SGP40 VOC sensor data
+                if data.get('sensor') == 'SGP40' or 'voc_index' in data:
+                    sensor_name = data.get('sensor', 'SGP40')
+                    device_id = data.get('device_id', 'ESP32_SGP40')
+                    point = Point("sgp40_voc") \
+                        .tag("sensor", sensor_name) \
+                        .tag("device_id", device_id) \
+                        .tag("topic", topic) \
+                        .time(time.time_ns())
+                    
+                    # VOC Index
+                    if 'voc_index' in data:
+                        point = point.field("voc_index", float(data['voc_index']))
+                    
+                    # Raw Gas value
+                    if 'raw_gas' in data:
+                        point = point.field("raw_gas", float(data['raw_gas']))
+                    
+                    # Store sensor timestamp if available
+                    if 'timestamp' in data:
+                        point = point.field("sensor_timestamp", float(data['timestamp']))
+                    
+                    # Write SGP40 data to InfluxDB
+                    write_api.write(bucket=INFLUXDB_BUCKET, org=INFLUXDB_ORG, record=point)
+                    logger.info(f"Stored SGP40 VOC data: topic={topic}, voc_index={data.get('voc_index')}, raw_gas={data.get('raw_gas')}")
+                    return
+                
                 # Handle ESP32_PIR_IMU sensor data (combined PIR motion + IMU)
                 if data.get('sensor') == 'ESP32_PIR_IMU' or ('motion' in data and 'imu' in data):
                     sensor_name = data.get('sensor', 'ESP32_PIR_IMU')
